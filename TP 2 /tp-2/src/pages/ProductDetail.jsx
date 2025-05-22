@@ -1,26 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+// src/pages/ProductDetail.jsx
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { getProductById } from "../services/products";
 
 export default function ProductDetail() {
-  const { id } = useParams();
+  const { productId } = useParams();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    fetch('/products.json')
-      .then(res => res.json())
-      .then(data => {
-        const found = data.find(p => p.id.toString() === id);
-        setProduct(found);
-      });
-  }, [id]);
+    const fetch = async () => {
+      const data = await getProductById({ product_id: productId });
+      setProduct(data);
+    };
+    fetch();
+  }, [productId]);
 
-  if (!product) return <p>Cargando...</p>;
+  if (!product) return <p style={{ padding: "2rem" }}>Cargando producto...</p>;
 
   return (
-    <div>
+    <div style={{ padding: "2rem" }}>
       <h2>{product.name}</h2>
-      <p>Descripción: {product.description}</p>
-      <p>Precio: ${product.price}</p>
+      <p><strong>Precio:</strong> ${product.price}</p>
+      <p><strong>Descripción:</strong> {product.description || "No hay descripción."}</p>
+      <Link to="/" style={{ marginTop: "1rem", display: "inline-block", color: "#007bff" }}>
+        ← Volver a productos
+      </Link>
     </div>
   );
 }
